@@ -22,6 +22,18 @@ class CollectionsScreen extends StatefulWidget {
 
 class CollectionsScreenState extends State<CollectionsScreen> {
   final _collections = <Collection>[
+    Collection.withItems("Numbers", [
+      Item("0"),
+      Item("1"),
+      Item("2"),
+      Item("3"),
+      Item("4"),
+      Item("5"),
+      Item("6"),
+      Item("7"),
+      Item("8"),
+      Item("9"),
+    ]),
     Collection.withItems("Proglangs", [
       Item("C"),
       Item("CXX"),
@@ -62,7 +74,8 @@ class CollectionsScreenState extends State<CollectionsScreen> {
   }
 
   void _newCollection() async {
-    String name = await _showInputDialog("New collection...", "Name", null);
+    String name =
+        await _showInputDialog(context, "New collection...", "Name", null);
 
     if (name != null && name.isNotEmpty) {
       setState(() {
@@ -76,7 +89,6 @@ class CollectionsScreenState extends State<CollectionsScreen> {
           );
         }));
       });
-
     }
   }
 
@@ -123,12 +135,14 @@ class CollectionsScreenState extends State<CollectionsScreen> {
       },
       child: ListTile(
         title: Text(collection.name, style: _biggerFont),
-        trailing: IconButton(
-          icon: Icon(Icons.radio),
-          onPressed: () {
-            _rollDiceFor(collection);
-          },
-        ),
+        trailing: collection.isNotEmpty
+            ? IconButton(
+                icon: Icon(Icons.radio),
+                onPressed: () {
+                  _rollDiceFor(collection);
+                },
+              )
+            : null,
         onTap: () {
           _showCollection(collection);
         },
@@ -146,45 +160,8 @@ class CollectionsScreenState extends State<CollectionsScreen> {
   }
 
   void _rollDiceFor(Collection collection) {
-    print("_rollDiceFor: ${collection.name}");
-  }
-
-  Future<String> _showInputDialog(
-      String title, String valueTitle, String initialValue) async {
-    String text;
-    return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(title),
-            content: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: TextEditingController()
-                      ..text = initialValue != null ? initialValue : "",
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: valueTitle,
-                    ),
-                    onChanged: (value) {
-                      text = value;
-                    },
-                  ),
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Ok"),
-                onPressed: () {
-                  Navigator.of(context).pop(text);
-                },
-              ),
-            ],
-          );
-        });
+    Item item = collection.randomItem();
+    print("_rollDiceFor: ${collection.name} item: ${item.name}");
   }
 }
 
@@ -215,7 +192,9 @@ class CollectionEditorState extends State<CollectionEditor> {
           )
         ],
       ),
-      body: widget.collection.items.isEmpty ? _placeholderItemList() : _itemList(),
+      body: widget.collection.items.isEmpty
+          ? _placeholderItemList()
+          : _itemList(),
       floatingActionButton: FloatingActionButton(
         onPressed: _addItem,
         tooltip: "Add item...",
@@ -250,8 +229,8 @@ class CollectionEditorState extends State<CollectionEditor> {
   }
 
   void _editTitle() async {
-    String value =
-        await _showInputDialog("Edit collection name:", widget.collection.name);
+    String value = await _showInputDialog(context, "Edit collection name:",
+        "Collection name", widget.collection.name);
     if (value != null && value.isNotEmpty) {
       setState(() {
         widget.collection.name = value;
@@ -277,48 +256,53 @@ class CollectionEditorState extends State<CollectionEditor> {
   }
 
   void _addItem() async {
-    String value = await _showInputDialog("Item", null);
+    String value = await _showInputDialog(context, "Item", "Item Name", null);
     if (value != null && value.isNotEmpty) {
       setState(() {
         widget.collection.addItem(Item(value));
       });
     }
   }
+}
 
-  Future<String> _showInputDialog(String title, String inputValue) async {
-    String text;
-    return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(title),
-            content: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: TextEditingController()
-                      ..text = inputValue != null ? inputValue : "",
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: title,
-                    ),
-                    onChanged: (value) {
-                      text = value;
-                    },
+//
+//  Util
+//
+
+Future<String> _showInputDialog(BuildContext context, String title,
+    String valueTitle, String initialValue) async {
+  String text;
+  return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Row(
+            children: <Widget>[
+              Expanded(
+                child: TextField(
+                  controller: TextEditingController()
+                    ..text = initialValue != null ? initialValue : "",
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    labelText: valueTitle,
                   ),
+                  onChanged: (value) {
+                    text = value;
+                  },
                 ),
-              ],
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Ok"),
-                onPressed: () {
-                  Navigator.of(context).pop(text);
-                },
               ),
             ],
-          );
-        });
-  }
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop(text);
+              },
+            ),
+          ],
+        );
+      });
 }
