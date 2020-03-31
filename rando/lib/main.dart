@@ -21,38 +21,7 @@ class CollectionsScreen extends StatefulWidget {
 }
 
 class CollectionsScreenState extends State<CollectionsScreen> {
-  final _collections = <Collection>[
-    Collection.withItems("Numbers", [
-      Item("0"),
-      Item("1"),
-      Item("2"),
-      Item("3"),
-      Item("4"),
-      Item("5"),
-      Item("6"),
-      Item("7"),
-      Item("8"),
-      Item("9"),
-    ]),
-    Collection.withItems("Proglangs", [
-      Item("C"),
-      Item("CXX"),
-      Item("C#"),
-      Item("Dart"),
-      Item("Python"),
-      Item("Java"),
-      Item("Rust"),
-    ]),
-    Collection.withItems("Styles", [
-      Item("Shaolin"),
-      Item("Wing Chun"),
-      Item("Tai Chi"),
-      Item("Northern Praying Mantis"),
-      Item("Baguazhang"),
-      Item("Xingyiquan"),
-      Item("Bajiquan")
-    ])
-  ];
+  final CollectionsStore _store = CollectionsStore();
 
   final _biggerFont = const TextStyle(fontSize: 18);
 
@@ -62,9 +31,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
       appBar: AppBar(
         title: Text("Rando"),
       ),
-      body: _collections.isEmpty
-          ? _placeholderCollectionsList()
-          : _collectionsList(),
+      body: _store.isEmpty ? _placeholderCollectionsList() : _collectionsList(),
       floatingActionButton: FloatingActionButton(
         onPressed: _newCollection,
         tooltip: "New Collection",
@@ -80,7 +47,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
     if (name != null && name.isNotEmpty) {
       setState(() {
         Collection newCollection = Collection(name);
-        _collections.add(newCollection);
+        _store.add(newCollection);
 
         Navigator.of(context)
             .push(MaterialPageRoute<void>(builder: (BuildContext context) {
@@ -107,7 +74,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
   }
 
   Widget _collectionsList() {
-    final Iterable<Widget> collections = _collections.map((Collection c) {
+    final Iterable<Widget> collections = _store.collections.map((Collection c) {
       return _buildRow(c);
     });
     final List<Widget> divided =
@@ -125,7 +92,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
       key: Key(collection.name),
       onDismissed: (direction) {
         setState(() {
-          _collections.remove(collection);
+          _store.remove(collection);
         });
         Scaffold.of(context).showSnackBar(
           SnackBar(
@@ -155,6 +122,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
         .push(MaterialPageRoute<void>(builder: (BuildContext context) {
       return CollectionEditor(
         collection: collection,
+        onCollectionEdited: null,
       );
     }));
   }
@@ -171,7 +139,9 @@ class CollectionsScreenState extends State<CollectionsScreen> {
 
 class CollectionEditor extends StatefulWidget {
   final Collection collection;
-  const CollectionEditor({Key key, this.collection}) : super(key: key);
+  final Function(Collection) onCollectionEdited;
+  const CollectionEditor({Key key, this.collection, this.onCollectionEdited})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => CollectionEditorState();
@@ -234,6 +204,9 @@ class CollectionEditorState extends State<CollectionEditor> {
     if (value != null && value.isNotEmpty) {
       setState(() {
         widget.collection.name = value;
+        if (widget.onCollectionEdited != null) {
+          widget.onCollectionEdited(widget.collection);
+        }
       });
     }
   }
@@ -247,6 +220,9 @@ class CollectionEditorState extends State<CollectionEditor> {
       onDismissed: (direction) {
         setState(() {
           widget.collection.removeItem(item);
+          if (widget.onCollectionEdited != null) {
+            widget.onCollectionEdited(widget.collection);
+          }
         });
       },
       child: ListTile(
@@ -260,6 +236,9 @@ class CollectionEditorState extends State<CollectionEditor> {
     if (value != null && value.isNotEmpty) {
       setState(() {
         widget.collection.addItem(Item(value));
+        if (widget.onCollectionEdited != null) {
+          widget.onCollectionEdited(widget.collection);
+        }
       });
     }
   }
