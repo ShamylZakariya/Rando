@@ -2,38 +2,41 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rando/model.dart';
 
-void main() => runApp(MyApp());
+void main(){
+  // since we're loading from data dir *before* starting
+  // the app, this call is needed to get the bindings ready
+  WidgetsFlutterBinding.ensureInitialized();
+  CollectionsStore store = CollectionsStore();
+  store.load((){
+    runApp(MyApp(store));
+  });
+}
 
 class MyApp extends StatelessWidget {
+  final CollectionsStore _store;
+
+  MyApp(this._store);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Rando",
-      home: CollectionsScreen(),
+      home: CollectionsScreen(store: _store),
       theme: ThemeData(primaryColor: Colors.yellow),
     );
   }
 }
 
 class CollectionsScreen extends StatefulWidget {
+  final CollectionsStore store;
+  CollectionsScreen({Key key, this.store}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => CollectionsScreenState();
 }
 
 class CollectionsScreenState extends State<CollectionsScreen> {
-  final CollectionsStore _store = CollectionsStore();
-
   final _biggerFont = const TextStyle(fontSize: 18);
-
-  CollectionsScreenState() {
-    _store.load((){
-      setState(() {
-        // TODO: This is clearly not the right approach here.
-        // We get a brief flicker of empty content, etc.
-        print("_store.load complete");
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +44,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
       appBar: AppBar(
         title: Text("Rando"),
       ),
-      body: _store.isEmpty ? _placeholderCollectionsList() : _collectionsList(),
+      body: widget.store.isEmpty ? _placeholderCollectionsList() : _collectionsList(),
       floatingActionButton: FloatingActionButton(
         onPressed: _newCollection,
         tooltip: "New Collection",
@@ -57,7 +60,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
     if (name != null && name.isNotEmpty) {
       setState(() {
         Collection newCollection = Collection(name);
-        _store.add(newCollection);
+        widget.store.add(newCollection);
 
         Navigator.of(context)
             .push(MaterialPageRoute<void>(builder: (BuildContext context) {
@@ -84,7 +87,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
   }
 
   Widget _collectionsList() {
-    final Iterable<Widget> collections = _store.collections.map((Collection c) {
+    final Iterable<Widget> collections = widget.store.collections.map((Collection c) {
       return _buildRow(c);
     });
     final List<Widget> divided =
@@ -102,7 +105,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
       key: Key(collection.name),
       onDismissed: (direction) {
         setState(() {
-          _store.remove(collection);
+          widget.store.remove(collection);
         });
         Scaffold.of(context).showSnackBar(
           SnackBar(
