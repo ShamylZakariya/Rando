@@ -25,6 +25,16 @@ class CollectionsScreenState extends State<CollectionsScreen> {
 
   final _biggerFont = const TextStyle(fontSize: 18);
 
+  CollectionsScreenState() {
+    _store.load((){
+      setState(() {
+        // TODO: This is clearly not the right approach here.
+        // We get a brief flicker of empty content, etc.
+        print("_store.load complete");
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

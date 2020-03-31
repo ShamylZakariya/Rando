@@ -82,9 +82,7 @@ class Collection {
   Collection(this._name);
   Collection.fromJson(Map<String, dynamic> json) {
     _name = json['name'];
-    List<Map<String, dynamic>> itemJson =
-        json['items'] as List<Map<String, dynamic>>;
-    _items = itemJson.map((ij) => Item.fromJson(ij));
+    _items = json['items'].map<Item>((ij) => Item.fromJson(ij)).toList();
   }
   Collection.withItems(this._name, this._items) {
     _technique.setCount(_items.length);
@@ -139,47 +137,6 @@ class Collection {
 class CollectionsStore {
   List<Collection> _collections = [];
 
-  CollectionsStore() {
-    _collections = [
-      Collection.withItems("Numbers", [
-        Item("0"),
-        Item("1"),
-        Item("2"),
-        Item("3"),
-        Item("4"),
-        Item("5"),
-        Item("6"),
-        Item("7"),
-        Item("8"),
-        Item("9"),
-      ]),
-      Collection.withItems("Proglangs", [
-        Item("C"),
-        Item("CXX"),
-        Item("C#"),
-        Item("Dart"),
-        Item("Python"),
-        Item("Java"),
-        Item("Rust"),
-      ]),
-      Collection.withItems("Styles", [
-        Item("Shaolin"),
-        Item("Wing Chun"),
-        Item("Tai Chi"),
-        Item("Northern Praying Mantis"),
-        Item("Baguazhang"),
-        Item("Xingyiquan"),
-        Item("Bajiquan")
-      ])
-    ];
-
-    for (Collection c in _collections) {
-      c._onChanged = (c) {
-        _save();
-      };
-    }
-  }
-
   List<Collection> get collections => _collections;
   bool get isEmpty => _collections.isEmpty;
   bool get isNotEmpty => _collections.isNotEmpty;
@@ -199,11 +156,9 @@ class CollectionsStore {
     _save();
   }
 
-  void load(Function() onComplete) {
-    _load((collections){
-      _collections = collections;
-      onComplete();
-    });
+  void load(Function() onComplete) async {
+    _collections = await _load();
+    onComplete();
   }
 
   Future<File> _collectionsStoreFile() async {
@@ -211,23 +166,27 @@ class CollectionsStore {
     return File('${dir.path}/store.json');
   }
 
-  Future<List<Collection>> _load(Function(List<Collection>) onComplete) async {
+  Future<List<Collection>> _load() async {
     try {
       final file = await _collectionsStoreFile();
       String contents = await file.readAsString();
-      List<dynamic> collectionDataJson = jsonDecode(contents);
-      List<Collection> collections =
-          collectionDataJson.map((j) => Collection.fromJson(j)).toList();
-      onComplete(collections);
+      final collectionStoreJson = jsonDecode(contents);
+
+      List<Collection> collections = collectionStoreJson.map<Collection>((cj) {
+        Collection c = Collection.fromJson(cj);
+        c._onChanged = (c){_save();};
+        return c;
+      }).toList();
+
       return collections;
     } catch (e) {
-      print("loadCollectionsFromStore failed, error: $e");
+      print("_load failed, error: $e");
       return [];
     }
   }
 
   void _save() async {
-    List<dynamic> collectionsJsonData =
+    List<Map<String,dynamic>> collectionsJsonData =
         collections.map((c) => c.toJson()).toList();
     String collectionsJson = jsonEncode(collectionsJsonData);
 
