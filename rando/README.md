@@ -1,16 +1,9 @@
 # rando
 
-A new Flutter project.
+Simple app for making collections of stuff and easily rolling a die to pick one at random. You could have, for example, a list of restaraunts, and just tap the associated dice icon to pick one at random.
 
-## Getting Started
+## TODO
 
-This project is a starting point for a Flutter application.
+1) Need to rename from `com.example.rando` to `org.zakariya.rando`
+2) Need to move up one level from `Rando/rando` to `Rando`
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
