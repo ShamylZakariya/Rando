@@ -83,6 +83,7 @@ class Collection {
   Collection.fromJson(Map<String, dynamic> json) {
     _name = json['name'];
     _items = json['items'].map<Item>((ij) => Item.fromJson(ij)).toList();
+    _technique.setCount(_items.length);
   }
   Collection.withItems(this._name, this._items) {
     _technique.setCount(_items.length);
