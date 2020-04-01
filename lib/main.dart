@@ -2,12 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rando/model.dart';
 
-void main(){
+void main() {
   // since we're loading from data dir *before* starting
   // the app, this call is needed to get the bindings ready
   WidgetsFlutterBinding.ensureInitialized();
   CollectionsStore store = CollectionsStore();
-  store.load((){
+  store.load(() {
     runApp(MyApp(store));
   });
 }
@@ -44,7 +44,9 @@ class CollectionsScreenState extends State<CollectionsScreen> {
       appBar: AppBar(
         title: Text("Rando"),
       ),
-      body: widget.store.isEmpty ? _placeholderCollectionsList() : _collectionsList(),
+      body: widget.store.isEmpty
+          ? _placeholderCollectionsList()
+          : _collectionsList(),
       floatingActionButton: FloatingActionButton(
         onPressed: _newCollection,
         tooltip: "New Collection",
@@ -62,12 +64,7 @@ class CollectionsScreenState extends State<CollectionsScreen> {
         Collection newCollection = Collection(name);
         widget.store.add(newCollection);
 
-        Navigator.of(context)
-            .push(MaterialPageRoute<void>(builder: (BuildContext context) {
-          return CollectionEditor(
-            collection: newCollection,
-          );
-        }));
+        _showCollection(newCollection);
       });
     }
   }
@@ -87,7 +84,8 @@ class CollectionsScreenState extends State<CollectionsScreen> {
   }
 
   Widget _collectionsList() {
-    final Iterable<Widget> collections = widget.store.collections.map((Collection c) {
+    final Iterable<Widget> collections =
+        widget.store.collections.map((Collection c) {
       return _buildRow(c);
     });
     final List<Widget> divided =
@@ -131,23 +129,36 @@ class CollectionsScreenState extends State<CollectionsScreen> {
   }
 
   void _showCollection(Collection collection) {
-    Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (BuildContext context) {
+    showModalBottomSheet(context: context, builder: (BuildContext){
       return CollectionEditor(
         collection: collection,
-        onCollectionEdited: null,
+        onCollectionEdited: (c){
+          setState(() {
+            // something?
+          });
+        },
       );
-    }));
+    });
   }
 
   void _rollDiceFor(Collection collection) {
     Item item = collection.randomItem();
     print("_rollDiceFor: ${collection.name} item: ${item.name}");
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AvatarDialog(
+        buttonText: "Ok",
+        description: collection.name,
+        title: item.name)
+    );
   }
 }
 
 //
 //  CollectionEditor
+//  TODO: Show collection editor as a bottom sheet or some other modal
+//  appearance - it's confusing to have the collection editor show
+//  immediately, it looks like nothing happened.
 //
 
 class CollectionEditor extends StatefulWidget {
@@ -297,4 +308,105 @@ Future<String> _showInputDialog(BuildContext context, String title,
           ],
         );
       });
+}
+
+class AvatarDialog extends StatelessWidget {
+  final String title, description, buttonText;
+  final Image image;
+
+  static const double _padding = 16.0;
+  static const double _avatarRadius = 66.0;
+
+  AvatarDialog({
+    @required this.title,
+    @required this.description,
+    @required this.buttonText,
+    this.image,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_padding),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: _dialogContent(context),
+    );
+  }
+
+  _dialogContent(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        _card(context),
+        _circle(context),
+      ],
+    );
+  }
+
+  Widget _circle(BuildContext context) {
+    return Positioned(
+      left: _padding,
+      right: _padding,
+      child: CircleAvatar(
+        backgroundColor: Colors.blueAccent,
+        radius: _avatarRadius,
+      ),
+    );
+  }
+
+  Widget _card(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: _avatarRadius + _padding,
+        bottom: _padding,
+        left: _padding,
+        right: _padding,
+      ),
+      margin: EdgeInsets.only(top: _avatarRadius),
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(_padding),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            offset: const Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // To make the card compact
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: 16.0),
+          Text(
+            description,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16.0,
+            ),
+          ),
+          SizedBox(height: 24.0),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // To close the dialog
+              },
+              child: Text(buttonText),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
