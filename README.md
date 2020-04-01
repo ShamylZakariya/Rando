@@ -5,4 +5,3 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
 ## TODO
 
 1) Need to rename from `com.example.rando` to `org.zakariya.rando`
-

@@ -1,4 +1,4 @@
-package com.example.rando
+package org.zakariya.rando
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
