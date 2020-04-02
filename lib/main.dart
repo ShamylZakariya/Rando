@@ -8,12 +8,12 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => CollectionsStore(),
-      child: MyApp(),
+      child: RandoApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class RandoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -63,7 +63,9 @@ class CollectionsScreen extends StatelessWidget {
           case LoadState.Loading:
             return _bodyForLoadingState(context, store);
           case LoadState.Loaded:
-            return _bodyForLoadedState(context, store);
+            return store.isEmpty
+                ? _bodyForLoadedEmptyState(context, store)
+                : _bodyForLoadedState(context, store);
         }
         return null;
       },
@@ -71,56 +73,48 @@ class CollectionsScreen extends StatelessWidget {
   }
 
   Widget _bodyForUnloadedState(BuildContext context, CollectionsStore store) {
-    return Center(
-      child: Column(
-        children: <Widget>[Text("Starting...")],
-        mainAxisAlignment: MainAxisAlignment.center,
-      ),
-    );
+    return Container();
   }
 
   Widget _bodyForLoadingState(BuildContext context, CollectionsStore store) {
+    return Container();
+  }
+
+  Widget _bodyForLoadedEmptyState(
+      BuildContext context, CollectionsStore store) {
     return Center(
       child: Column(
-        children: <Widget>[Text("Loading...")],
+        children: <Widget>[
+          MaterialButton(
+            child: Text("Create a Collection..."),
+            onPressed: () => _onNewCollection(context),
+          )
+        ],
         mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
   }
 
   Widget _bodyForLoadedState(BuildContext context, CollectionsStore store) {
-    if (store.isEmpty) {
-      return Center(
-        child: Column(
-          children: <Widget>[
-            MaterialButton(
-              child: Text("Create a Collection..."),
-              onPressed: () => _onNewCollection(context),
-            )
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
-      );
-    } else {
-      final Iterable<Widget> collections =
-          store.collections.map((Collection c) {
-        return _buildRow(context, c);
-      });
-      final List<Widget> divided =
-          ListTile.divideTiles(context: context, tiles: collections).toList();
-      return ListView(
-        children: divided,
-      );
-    }
+    // show our list of Collections
+    final Iterable<Widget> collections = store.collections.map((Collection c) {
+      return _buildCollectionRow(context, c);
+    });
+    final List<Widget> divided =
+        ListTile.divideTiles(context: context, tiles: collections).toList();
+    return ListView(
+      children: divided,
+    );
   }
 
-  Widget _buildRow(BuildContext context, Collection collection) {
+  Widget _buildCollectionRow(BuildContext context, Collection collection) {
     return ChangeNotifierProvider.value(
       value: collection,
       child: Consumer<Collection>(
         builder: (context, collection, _) {
           return Dismissible(
             background: Container(
+              // TODO: Embed a delete icon
               color: Colors.red,
             ),
             key: Key(collection.name),
@@ -224,7 +218,7 @@ class CollectionEditor extends StatelessWidget {
     }
 
     final Iterable<Widget> items = collection.items.map((Item i) {
-      return _buildRow(context, collection, i);
+      return _buildItemRow(context, collection, i);
     });
 
     final List<Widget> divided =
@@ -243,13 +237,14 @@ class CollectionEditor extends StatelessWidget {
     }
   }
 
-  Widget _buildRow(BuildContext context, Collection collection, Item item) {
+  Widget _buildItemRow(BuildContext context, Collection collection, Item item) {
     return ChangeNotifierProvider.value(
       value: item,
       child: Consumer<Item>(
         builder: (context, item, _) {
           return Dismissible(
             background: Container(
+              // TODO: Embed a delete icon
               color: Colors.red,
             ),
             key: Key(item.name),
@@ -317,7 +312,6 @@ Future<String> _showInputDialog(BuildContext context, String title,
 
 class ShowDiceRollResultDialog extends StatelessWidget {
   final String title, description, buttonText;
-  final Image image;
 
   static const double _padding = 16.0;
   static const double _avatarRadius = 66.0;
@@ -326,7 +320,6 @@ class ShowDiceRollResultDialog extends StatelessWidget {
     @required this.title,
     @required this.description,
     @required this.buttonText,
-    this.image,
   });
 
   @override
@@ -337,27 +330,7 @@ class ShowDiceRollResultDialog extends StatelessWidget {
       ),
       elevation: 0.0,
       backgroundColor: Colors.transparent,
-      child: _dialogContent(context),
-    );
-  }
-
-  _dialogContent(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        _card(context),
-        _circle(context),
-      ],
-    );
-  }
-
-  Widget _circle(BuildContext context) {
-    return Positioned(
-      left: _padding,
-      right: _padding,
-      child: CircleAvatar(
-        backgroundColor: Colors.blueAccent,
-        radius: _avatarRadius,
-      ),
+      child: _card(context),
     );
   }
 
