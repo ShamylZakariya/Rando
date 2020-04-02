@@ -1,41 +1,30 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:rando/model.dart';
 
 void main() {
-  // since we're loading from data dir *before* starting
-  // the app, this call is needed to get the bindings ready
-  WidgetsFlutterBinding.ensureInitialized();
-  CollectionsStore store = CollectionsStore();
-  store.load(() {
-    runApp(MyApp(store));
-  });
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CollectionsStore(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  final CollectionsStore _store;
-
-  MyApp(this._store);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Rando",
-      home: CollectionsScreen(store: _store),
+      home: CollectionsScreen(),
       theme: ThemeData(primaryColor: Colors.yellow),
     );
   }
 }
 
-class CollectionsScreen extends StatefulWidget {
-  final CollectionsStore store;
-  CollectionsScreen({Key key, this.store}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => CollectionsScreenState();
-}
-
-class CollectionsScreenState extends State<CollectionsScreen> {
+class CollectionsScreen extends StatelessWidget {
   final _biggerFont = const TextStyle(fontSize: 18);
 
   @override
@@ -44,113 +33,143 @@ class CollectionsScreenState extends State<CollectionsScreen> {
       appBar: AppBar(
         title: Text("Rando"),
       ),
-      body: widget.store.isEmpty
-          ? _placeholderCollectionsList()
-          : _collectionsList(),
+      body: _body(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _newCollection,
+        onPressed: () => _onNewCollection(context),
         tooltip: "New Collection",
         child: Icon(Icons.add),
       ),
     );
   }
 
-  void _newCollection() async {
+  void _onNewCollection(BuildContext context) async {
     String name =
         await _showInputDialog(context, "New collection...", "Name", null);
 
     if (name != null && name.isNotEmpty) {
-      setState(() {
-        Collection newCollection = Collection(name);
-        widget.store.add(newCollection);
+      Collection newCollection = Collection(name);
+      Provider.of<CollectionsStore>(context, listen: false).add(newCollection);
 
-        _showCollection(newCollection);
-      });
+      _showCollection(context, newCollection);
     }
   }
 
-  Widget _placeholderCollectionsList() {
+  Widget _body() {
+    return Consumer<CollectionsStore>(
+      builder: (context, store, child) {
+        switch (store.loadState) {
+          case LoadState.Unloaded:
+            return _bodyForUnloadedState(context, store);
+          case LoadState.Loading:
+            return _bodyForLoadingState(context, store);
+          case LoadState.Loaded:
+            return _bodyForLoadedState(context, store);
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _bodyForUnloadedState(BuildContext context, CollectionsStore store) {
     return Center(
       child: Column(
-        children: <Widget>[
-          MaterialButton(
-            child: Text("Create a Collection..."),
-            onPressed: _newCollection,
-          )
-        ],
+        children: <Widget>[Text("Starting...")],
         mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
   }
 
-  Widget _collectionsList() {
-    final Iterable<Widget> collections =
-        widget.store.collections.map((Collection c) {
-      return _buildRow(c);
-    });
-    final List<Widget> divided =
-        ListTile.divideTiles(context: context, tiles: collections).toList();
-    return ListView(
-      children: divided,
-    );
-  }
-
-  Widget _buildRow(Collection collection) {
-    return Dismissible(
-      background: Container(
-        color: Colors.red,
-      ),
-      key: Key(collection.name),
-      onDismissed: (direction) {
-        setState(() {
-          widget.store.remove(collection);
-        });
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Deleted ${collection.name}"),
-          ),
-        );
-      },
-      child: ListTile(
-        title: Text(collection.name, style: _biggerFont),
-        trailing: collection.isNotEmpty
-            ? IconButton(
-                icon: Icon(Icons.radio),
-                onPressed: () {
-                  _rollDiceFor(collection);
-                },
-              )
-            : null,
-        onTap: () {
-          _showCollection(collection);
-        },
+  Widget _bodyForLoadingState(BuildContext context, CollectionsStore store) {
+    return Center(
+      child: Column(
+        children: <Widget>[Text("Loading...")],
+        mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
   }
 
-  void _showCollection(Collection collection) {
-    showModalBottomSheet(context: context, builder: (BuildContext){
-      return CollectionEditor(
-        collection: collection,
-        onCollectionEdited: (c){
-          setState(() {
-            // something?
-          });
-        },
+  Widget _bodyForLoadedState(BuildContext context, CollectionsStore store) {
+    if (store.isEmpty) {
+      return Center(
+        child: Column(
+          children: <Widget>[
+            MaterialButton(
+              child: Text("Create a Collection..."),
+              onPressed: () => _onNewCollection(context),
+            )
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+        ),
       );
-    });
+    } else {
+      final Iterable<Widget> collections =
+          store.collections.map((Collection c) {
+        return _buildRow(context, c);
+      });
+      final List<Widget> divided =
+          ListTile.divideTiles(context: context, tiles: collections).toList();
+      return ListView(
+        children: divided,
+      );
+    }
   }
 
-  void _rollDiceFor(Collection collection) {
+  Widget _buildRow(BuildContext context, Collection collection) {
+    return ChangeNotifierProvider.value(
+      value: collection,
+      child: Consumer<Collection>(
+        builder: (context, collection, _) {
+          return Dismissible(
+            background: Container(
+              color: Colors.red,
+            ),
+            key: Key(collection.name),
+            onDismissed: (direction) {
+              Provider.of<CollectionsStore>(context, listen: false)
+                  .remove(collection);
+
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Deleted ${collection.name}"),
+                ),
+              );
+            },
+            child: ListTile(
+              title: Text(collection.name, style: _biggerFont),
+              trailing: collection.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.radio),
+                      onPressed: () {
+                        _rollDiceFor(context, collection);
+                      },
+                    )
+                  : null,
+              onTap: () {
+                _showCollection(context, collection);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showCollection(BuildContext context, Collection collection) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) => ChangeNotifierProvider.value(
+              value: collection,
+              child: CollectionEditor(),
+            ));
+  }
+
+  void _rollDiceFor(BuildContext context, Collection collection) {
     Item item = collection.randomItem();
     print("_rollDiceFor: ${collection.name} item: ${item.name}");
     showDialog(
-      context: context,
-      builder: (BuildContext context) => AvatarDialog(
-        buttonText: "Ok",
-        description: collection.name,
-        title: item.name)
-    );
+        context: context,
+        builder: (BuildContext context) => ShowDiceRollResultDialog(
+            buttonText: "Ok", description: collection.name, title: item.name));
   }
 }
 
@@ -161,109 +180,95 @@ class CollectionsScreenState extends State<CollectionsScreen> {
 //  immediately, it looks like nothing happened.
 //
 
-class CollectionEditor extends StatefulWidget {
-  final Collection collection;
-  final Function(Collection) onCollectionEdited;
-  const CollectionEditor({Key key, this.collection, this.onCollectionEdited})
-      : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => CollectionEditorState();
-}
-
-class CollectionEditorState extends State<CollectionEditor> {
+class CollectionEditor extends StatelessWidget {
   final _biggerFont = const TextStyle(fontSize: 18);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.collection.name),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: _editTitle,
-          )
-        ],
-      ),
-      body: widget.collection.items.isEmpty
-          ? _placeholderItemList()
-          : _itemList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addItem,
-        tooltip: "Add item...",
-        child: Icon(Icons.add),
-      ),
+    return Consumer<Collection>(
+      builder: (context, collection, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(collection.name),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () => _editTitle(context, collection),
+              )
+            ],
+          ),
+          body: _itemList(context, collection),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _addItem(context, collection),
+            tooltip: "Add item...",
+            child: Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 
-  Widget _placeholderItemList() {
-    return Center(
-      child: Column(
-        children: <Widget>[
-          MaterialButton(
-            child: Text("Add some items..."),
-            onPressed: _addItem,
-          )
-        ],
-        mainAxisAlignment: MainAxisAlignment.center,
-      ),
-    );
-  }
+  Widget _itemList(BuildContext context, Collection collection) {
+    if (collection.isEmpty) {
+      return Center(
+        child: Column(
+          children: <Widget>[
+            MaterialButton(
+              child: Text("Add some items..."),
+              onPressed: () => _addItem(context, collection),
+            )
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+        ),
+      );
+    }
 
-  Widget _itemList() {
-    final Iterable<Widget> items = widget.collection.items.map((Item i) {
-      return _buildRow(i);
+    final Iterable<Widget> items = collection.items.map((Item i) {
+      return _buildRow(context, collection, i);
     });
+
     final List<Widget> divided =
         ListTile.divideTiles(context: context, tiles: items).toList();
+
     return ListView(
       children: divided,
     );
   }
 
-  void _editTitle() async {
-    String value = await _showInputDialog(context, "Edit collection name:",
-        "Collection name", widget.collection.name);
+  void _editTitle(BuildContext context, Collection collection) async {
+    String value = await _showInputDialog(
+        context, "Edit collection name:", "Collection name", collection.name);
     if (value != null && value.isNotEmpty) {
-      setState(() {
-        widget.collection.name = value;
-        if (widget.onCollectionEdited != null) {
-          widget.onCollectionEdited(widget.collection);
-        }
-      });
+      collection.name = value;
     }
   }
 
-  Widget _buildRow(Item item) {
-    return Dismissible(
-      background: Container(
-        color: Colors.red,
-      ),
-      key: Key(item.name),
-      onDismissed: (direction) {
-        setState(() {
-          widget.collection.removeItem(item);
-          if (widget.onCollectionEdited != null) {
-            widget.onCollectionEdited(widget.collection);
-          }
-        });
-      },
-      child: ListTile(
-        title: Text(item.name, style: _biggerFont),
+  Widget _buildRow(BuildContext context, Collection collection, Item item) {
+    return ChangeNotifierProvider.value(
+      value: item,
+      child: Consumer<Item>(
+        builder: (context, item, _) {
+          return Dismissible(
+            background: Container(
+              color: Colors.red,
+            ),
+            key: Key(item.name),
+            onDismissed: (direction) {
+              collection.removeItem(item);
+            },
+            child: ListTile(
+              title: Text(item.name, style: _biggerFont),
+            ),
+          );
+        },
       ),
     );
   }
 
-  void _addItem() async {
+  void _addItem(BuildContext context, Collection collection) async {
     String value = await _showInputDialog(context, "Item", "Item Name", null);
     if (value != null && value.isNotEmpty) {
-      setState(() {
-        widget.collection.addItem(Item(value));
-        if (widget.onCollectionEdited != null) {
-          widget.onCollectionEdited(widget.collection);
-        }
-      });
+      collection.addItem(Item(value));
     }
   }
 }
@@ -310,14 +315,14 @@ Future<String> _showInputDialog(BuildContext context, String title,
       });
 }
 
-class AvatarDialog extends StatelessWidget {
+class ShowDiceRollResultDialog extends StatelessWidget {
   final String title, description, buttonText;
   final Image image;
 
   static const double _padding = 16.0;
   static const double _avatarRadius = 66.0;
 
-  AvatarDialog({
+  ShowDiceRollResultDialog({
     @required this.title,
     @required this.description,
     @required this.buttonText,

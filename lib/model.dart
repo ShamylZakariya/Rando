@@ -1,17 +1,25 @@
+import 'dart:collection';
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
-class Item {
-  String name;
+class Item extends ChangeNotifier {
+  String _name;
 
-  Item(this.name);
-  Item.fromJson(Map<String, dynamic> json) : name = json['name'];
+  Item(this._name);
+  Item.fromJson(Map<String, dynamic> json) : _name = json['name'];
 
-  Map<String, dynamic> toJson() => {'name': name};
+  set name(newName) {
+    _name = newName;
+    notifyListeners();
+  }
+
+  String get name => _name;
+
+  Map<String, dynamic> toJson() => {'name': _name};
 }
 
 class _BaseRandomSelectionTechnique {
@@ -71,10 +79,9 @@ class _PermutationRandomSelectionTechnique
   }
 }
 
-class Collection {
+class Collection extends ChangeNotifier {
   String _name;
   List<Item> _items = [];
-  Function(Collection) _onChanged;
 
   _BaseRandomSelectionTechnique _technique =
       _PermutationRandomSelectionTechnique(0);
@@ -90,76 +97,91 @@ class Collection {
   }
 
   Map<String, dynamic> toJson() =>
-      {'name': _name, 'items': _items.map((i) => i.toJson()).toList() };
+      {'name': _name, 'items': _items.map((i) => i.toJson()).toList()};
 
   String get name => _name;
   set name(String newName) {
     _name = newName;
-    _notifyChange();
+    notifyListeners();
   }
 
-  List<Item> get items => _items;
+  UnmodifiableListView<Item> get items => UnmodifiableListView(_items);
 
   void addItem(Item item) {
-    items.add(item);
-    _technique.setCount(items.length);
-    _notifyChange();
+    _items.add(item);
+    _technique.setCount(_items.length);
+    notifyListeners();
   }
 
   void removeItem(Item item) {
-    items.remove(item);
-    _technique.setCount(items.length);
-    _notifyChange();
+    _items.remove(item);
+    _technique.setCount(_items.length);
+    notifyListeners();
   }
 
   void clearItems() {
-    items.clear();
+    _items.clear();
     _technique.setCount(0);
-    _notifyChange();
+    notifyListeners();
   }
 
-  bool get isEmpty => items.isEmpty;
-  bool get isNotEmpty => items.isNotEmpty;
+  bool get isEmpty => _items.isEmpty;
+  bool get isNotEmpty => _items.isNotEmpty;
 
   Item randomItem() {
-    if (items.isNotEmpty) {
-      return items[_technique.next()];
+    if (_items.isNotEmpty) {
+      return _items[_technique.next()];
     }
     return null;
   }
-
-  void _notifyChange() {
-    if (_onChanged != null) {
-      _onChanged(this);
-    }
-  }
 }
 
-class CollectionsStore {
+enum LoadState {
+  Unloaded,
+  Loading,
+  Loaded
+}
+
+class CollectionsStore extends ChangeNotifier {
   List<Collection> _collections = [];
+  LoadState _loadState = LoadState.Unloaded;
 
   List<Collection> get collections => _collections;
   bool get isEmpty => _collections.isEmpty;
   bool get isNotEmpty => _collections.isNotEmpty;
+  LoadState get loadState => _loadState;
+
+  CollectionsStore() {
+    _load().then((collections) {
+      _collections = collections;
+      for (Collection c in collections) {
+        c.addListener((){
+          _save();
+        });
+      }
+      notifyListeners();
+    });
+  }
 
   void add(Collection collection) {
     _collections.add(collection);
+    collection.addListener((){
+      _save();
+    });
+    notifyListeners();
     _save();
   }
 
   void remove(Collection collection) {
     _collections.remove(collection);
+    notifyListeners();
     _save();
   }
 
   void clear() {
     _collections.clear();
+    notifyListeners();
     _save();
-  }
-
-  void load(Function() onComplete) async {
-    _collections = await _load();
-    onComplete();
   }
 
   Future<File> _collectionsStoreFile() async {
@@ -168,6 +190,9 @@ class CollectionsStore {
   }
 
   Future<List<Collection>> _load() async {
+    _loadState = LoadState.Loading;
+    notifyListeners();
+
     try {
       final file = await _collectionsStoreFile();
       String contents = await file.readAsString();
@@ -175,7 +200,6 @@ class CollectionsStore {
 
       List<Collection> collections = collectionStoreJson.map<Collection>((cj) {
         Collection c = Collection.fromJson(cj);
-        c._onChanged = (c){_save();};
         return c;
       }).toList();
 
@@ -183,11 +207,14 @@ class CollectionsStore {
     } catch (e) {
       print("_load failed, error: $e");
       return [];
+    } finally {
+      _loadState = LoadState.Loaded;
+      notifyListeners();
     }
   }
 
   void _save() async {
-    List<Map<String,dynamic>> collectionsJsonData =
+    List<Map<String, dynamic>> collectionsJsonData =
         collections.map((c) => c.toJson()).toList();
     String collectionsJson = jsonEncode(collectionsJsonData);
 
