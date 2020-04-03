@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:rando/common/theme.dart';
 import 'package:rando/model.dart';
 
 void main() {
@@ -19,7 +20,7 @@ class RandoApp extends StatelessWidget {
     return MaterialApp(
       title: "Rando",
       home: CollectionsScreen(),
-      theme: ThemeData(primaryColor: Colors.yellow),
+      theme: appTheme(context),
     );
   }
 }
@@ -31,7 +32,11 @@ class CollectionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Rando"),
+        title: Text(
+          "rando",
+          style: Theme.of(context).textTheme.display4,
+        ),
+        elevation: 0,
       ),
       body: _body(),
       floatingActionButton: FloatingActionButton(
@@ -192,7 +197,11 @@ class CollectionEditor extends StatelessWidget {
       builder: (context, collection, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(collection.name),
+            title: Text(
+              collection.name,
+              style: Theme.of(context).textTheme.display3,
+            ),
+            iconTheme: IconThemeData(color: Theme.of(context).iconTheme.color),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.edit),
@@ -319,19 +328,19 @@ class ShowDiceRollResultDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
+            description,
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              fontSize: 12.0,
+            ),
+          ),
+          Text(
             title,
             style: TextStyle(
               fontSize: 48.0,
               fontWeight: FontWeight.w700,
             ),
             textAlign: TextAlign.start,
-          ),
-          Text(
-            description,
-            textAlign: TextAlign.start,
-            style: TextStyle(
-              fontSize: 12.0,
-            ),
           ),
           Align(
             alignment: Alignment.bottomRight,
@@ -398,7 +407,7 @@ Widget _dismissibleBackground(BuildContext context) => Container(
             aspectRatio: 1,
             child: Icon(
               Icons.delete_outline,
-              color: Theme.of(context).canvasColor,
+              color: Colors.white.withAlpha(194),
             ),
           ),
           Spacer(),
@@ -406,7 +415,7 @@ Widget _dismissibleBackground(BuildContext context) => Container(
             aspectRatio: 1,
             child: Icon(
               Icons.delete_outline,
-              color: Theme.of(context).canvasColor,
+              color: Colors.white.withAlpha(194),
             ),
           ),
         ],
