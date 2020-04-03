@@ -113,10 +113,7 @@ class CollectionsScreen extends StatelessWidget {
       child: Consumer<Collection>(
         builder: (context, collection, _) {
           return Dismissible(
-            background: Container(
-              // TODO: Embed a delete icon
-              color: Colors.red,
-            ),
+            background: _dismissibleBackground(context),
             key: Key(collection.name),
             onDismissed: (direction) {
               Provider.of<CollectionsStore>(context, listen: false)
@@ -265,10 +262,7 @@ class CollectionEditor extends StatelessWidget {
       child: Consumer<Item>(
         builder: (context, item, _) {
           return Dismissible(
-            background: Container(
-              // TODO: Embed a delete icon
-              color: Colors.red,
-            ),
+            background: _dismissibleBackground(context),
             key: Key(item.name),
             onDismissed: (direction) {
               collection.removeItem(item);
@@ -290,8 +284,72 @@ class CollectionEditor extends StatelessWidget {
   }
 }
 
+class ShowDiceRollResultDialog extends StatelessWidget {
+  final String title, description, buttonText;
+
+  static const double _cornerRadius = 8;
+  static const double _padding = 32;
+
+  ShowDiceRollResultDialog({
+    @required this.title,
+    @required this.description,
+    @required this.buttonText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_cornerRadius),
+      ),
+      child: _card(context),
+    );
+  }
+
+  Widget _card(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: _padding,
+        bottom: _padding / 2,
+        left: _padding,
+        right: _padding,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 48.0,
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            description,
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              fontSize: 12.0,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(buttonText),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 //
-//  Util
+//  Helpers
 //
 
 Future<String> _showInputDialog(BuildContext context, String title,
@@ -332,81 +390,25 @@ Future<String> _showInputDialog(BuildContext context, String title,
       });
 }
 
-class ShowDiceRollResultDialog extends StatelessWidget {
-  final String title, description, buttonText;
-
-  static const double _padding = 16.0;
-  static const double _avatarRadius = 66.0;
-
-  ShowDiceRollResultDialog({
-    @required this.title,
-    @required this.description,
-    @required this.buttonText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(_padding),
-      ),
-      elevation: 0.0,
-      backgroundColor: Colors.transparent,
-      child: _card(context),
-    );
-  }
-
-  Widget _card(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: _avatarRadius + _padding,
-        bottom: _padding,
-        left: _padding,
-        right: _padding,
-      ),
-      margin: EdgeInsets.only(top: _avatarRadius),
-      decoration: new BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(_padding),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            offset: const Offset(0.0, 10.0),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // To make the card compact
+Widget _dismissibleBackground(BuildContext context) => Container(
+      color: Colors.red,
+      child: Row(
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.w700,
+          AspectRatio(
+            aspectRatio: 1,
+            child: Icon(
+              Icons.delete_outline,
+              color: Theme.of(context).canvasColor,
             ),
           ),
-          SizedBox(height: 16.0),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16.0,
-            ),
-          ),
-          SizedBox(height: 24.0),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // To close the dialog
-              },
-              child: Text(buttonText),
+          Spacer(),
+          AspectRatio(
+            aspectRatio: 1,
+            child: Icon(
+              Icons.delete_outline,
+              color: Theme.of(context).canvasColor,
             ),
           ),
         ],
       ),
     );
-  }
-}
