@@ -150,11 +150,26 @@ class CollectionsScreen extends StatelessWidget {
 
   void _showCollection(BuildContext context, Collection collection) {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) => ChangeNotifierProvider.value(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: ClipRRect(
+            clipBehavior: Clip.antiAlias,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8),
+              topRight: Radius.circular(8),
+            ),
+            child: ChangeNotifierProvider.value(
               value: collection,
               child: CollectionEditor(),
-            ));
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _rollDiceFor(BuildContext context, Collection collection) {
@@ -169,9 +184,6 @@ class CollectionsScreen extends StatelessWidget {
 
 //
 //  CollectionEditor
-//  TODO: Show collection editor as a bottom sheet or some other modal
-//  appearance - it's confusing to have the collection editor show
-//  immediately, it looks like nothing happened.
 //
 
 class CollectionEditor extends StatelessWidget {
@@ -190,8 +202,14 @@ class CollectionEditor extends StatelessWidget {
                 onPressed: () => _editTitle(context, collection),
               )
             ],
+            leading: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            elevation: 0,
+            backgroundColor: Theme.of(context).canvasColor,
           ),
-          body: _itemList(context, collection),
+          body: _body(context, collection),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _addItem(context, collection),
             tooltip: "Add item...",
@@ -200,6 +218,10 @@ class CollectionEditor extends StatelessWidget {
         );
       },
     );
+  }
+
+  Widget _body(BuildContext context, Collection collection) {
+    return _itemList(context, collection);
   }
 
   Widget _itemList(BuildContext context, Collection collection) {
