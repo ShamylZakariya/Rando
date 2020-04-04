@@ -8,7 +8,7 @@ import 'package:rando/model.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => CollectionsStore(),
+      create: (context) => CollectionStore(),
       child: RandoApp(),
     ),
   );
@@ -34,7 +34,7 @@ class CollectionsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "rando",
-          style: Theme.of(context).textTheme.display4,
+          style: Theme.of(context).textTheme.title,
         ),
         elevation: 0,
       ),
@@ -53,14 +53,14 @@ class CollectionsScreen extends StatelessWidget {
 
     if (name != null && name.isNotEmpty) {
       Collection newCollection = Collection(name);
-      Provider.of<CollectionsStore>(context, listen: false).add(newCollection);
+      Provider.of<CollectionStore>(context, listen: false).add(newCollection);
 
       _showCollection(context, newCollection);
     }
   }
 
   Widget _body() {
-    return Consumer<CollectionsStore>(
+    return Consumer<CollectionStore>(
       builder: (context, store, child) {
         switch (store.loadState) {
           case LoadState.Unloaded:
@@ -77,16 +77,16 @@ class CollectionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _bodyForUnloadedState(BuildContext context, CollectionsStore store) {
+  Widget _bodyForUnloadedState(BuildContext context, CollectionStore store) {
     return Container();
   }
 
-  Widget _bodyForLoadingState(BuildContext context, CollectionsStore store) {
+  Widget _bodyForLoadingState(BuildContext context, CollectionStore store) {
     return Container();
   }
 
   Widget _bodyForLoadedEmptyState(
-      BuildContext context, CollectionsStore store) {
+      BuildContext context, CollectionStore store) {
     return Center(
       child: Column(
         children: <Widget>[
@@ -100,7 +100,7 @@ class CollectionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _bodyForLoadedState(BuildContext context, CollectionsStore store) {
+  Widget _bodyForLoadedState(BuildContext context, CollectionStore store) {
     // show our list of Collections
     final Iterable<Widget> collections = store.collections.map((Collection c) {
       return _buildCollectionRow(context, c);
@@ -120,16 +120,7 @@ class CollectionsScreen extends StatelessWidget {
           return Dismissible(
             background: _dismissibleBackground(context),
             key: Key(collection.name),
-            onDismissed: (direction) {
-              Provider.of<CollectionsStore>(context, listen: false)
-                  .remove(collection);
-
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Deleted ${collection.name}"),
-                ),
-              );
-            },
+            onDismissed: (direction) => _deleteCollection(context, collection),
             child: ListTile(
               title: Text(collection.name, style: _biggerFont),
               trailing: collection.isNotEmpty
@@ -146,6 +137,25 @@ class CollectionsScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _deleteCollection(BuildContext context, Collection collection) {
+    CollectionStore store = Provider.of<CollectionStore>(context, listen: false);
+    int idx = store.indexOf(collection);
+    store.remove(collection);
+
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Deleted ${collection.name}"),
+        action: SnackBarAction(
+          label: "Undo",
+          onPressed: () {
+            // re-insert the item at its original index
+            store.insert(idx, collection);
+          },
+        ),
       ),
     );
   }
@@ -177,10 +187,7 @@ class CollectionsScreen extends StatelessWidget {
   void _rollDiceFor(BuildContext context, Collection collection) {
     Item item = collection.randomItem();
     print("_rollDiceFor: ${collection.name} item: ${item.name}");
-    showDialog(
-        context: context,
-        builder: (BuildContext context) => ShowDiceRollResultDialog(
-            buttonText: "Ok", description: collection.name, title: item.name));
+    _showDiceRollResultDialog(context, collection, item);
   }
 }
 
@@ -199,7 +206,7 @@ class CollectionEditor extends StatelessWidget {
           appBar: AppBar(
             title: Text(
               collection.name,
-              style: Theme.of(context).textTheme.display3,
+              style: Theme.of(context).textTheme.subtitle,
             ),
             iconTheme: IconThemeData(color: Theme.of(context).iconTheme.color),
             actions: <Widget>[
@@ -273,9 +280,7 @@ class CollectionEditor extends StatelessWidget {
           return Dismissible(
             background: _dismissibleBackground(context),
             key: Key(item.name),
-            onDismissed: (direction) {
-              collection.removeItem(item);
-            },
+            onDismissed: (direction) => _deleteItem(context, collection, item),
             child: ListTile(
               title: Text(item.name, style: _biggerFont),
             ),
@@ -286,20 +291,41 @@ class CollectionEditor extends StatelessWidget {
   }
 
   void _addItem(BuildContext context, Collection collection) async {
-    String value = await _showInputDialog(context, "Item", "Item Name", null);
+    String value = await _showInputDialog(context, "Add item", "Name", null);
     if (value != null && value.isNotEmpty) {
-      collection.addItem(Item(value));
+      collection.add(Item(value));
     }
+  }
+
+  void _deleteItem(BuildContext context, Collection collection, Item item) {
+    int idx = collection.indexOf(item);
+    collection.remove(item);
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Deleted ${item.name}"),
+        action: SnackBarAction(
+          label: "Undo",
+          onPressed: () {
+            // re-insert the item at its original index
+            collection.insert(idx, item);
+          },
+        ),
+      ),
+    );
   }
 }
 
-class ShowDiceRollResultDialog extends StatelessWidget {
+//
+//  DiceRollResultDialog
+//
+
+class DiceRollResultDialog extends StatelessWidget {
   final String title, description, buttonText;
 
   static const double _cornerRadius = 8;
   static const double _padding = 32;
 
-  ShowDiceRollResultDialog({
+  DiceRollResultDialog({
     @required this.title,
     @required this.description,
     @required this.buttonText,
@@ -361,6 +387,40 @@ class ShowDiceRollResultDialog extends StatelessWidget {
 //  Helpers
 //
 
+void _showDiceRollResultDialog(
+    BuildContext context, Collection collection, Item item) {
+  showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "You got",
+            style: Theme.of(context).textTheme.display1,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                item.name,
+                style: Theme.of(context).textTheme.display3,
+                textAlign: TextAlign.start,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      });
+}
+
 Future<String> _showInputDialog(BuildContext context, String title,
     String valueTitle, String initialValue) async {
   String text;
@@ -369,7 +429,10 @@ Future<String> _showInputDialog(BuildContext context, String title,
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title),
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.display1,
+          ),
           content: Row(
             children: <Widget>[
               Expanded(
@@ -406,7 +469,7 @@ Widget _dismissibleBackground(BuildContext context) => Container(
           AspectRatio(
             aspectRatio: 1,
             child: Icon(
-              Icons.delete_outline,
+              Icons.delete,
               color: Colors.white.withAlpha(194),
             ),
           ),
@@ -414,7 +477,7 @@ Widget _dismissibleBackground(BuildContext context) => Container(
           AspectRatio(
             aspectRatio: 1,
             child: Icon(
-              Icons.delete_outline,
+              Icons.delete,
               color: Colors.white.withAlpha(194),
             ),
           ),

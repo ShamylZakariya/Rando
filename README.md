@@ -12,3 +12,6 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
     - need dice icon for the catalog list
     - need to make the dice roll dialog not suck
     - how to make bottom bar area transparent on android (when using gestural nav)?
+        - https://twitter.com/davey_burke/status/1126878112170405888
+        - https://github.com/flutter/flutter/issues/34678
+        - https://github.com/flutter/flutter/issues/32748

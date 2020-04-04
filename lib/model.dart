@@ -107,22 +107,32 @@ class Collection extends ChangeNotifier {
 
   UnmodifiableListView<Item> get items => UnmodifiableListView(_items);
 
-  void addItem(Item item) {
+  void add(Item item) {
     _items.add(item);
     _technique.setCount(_items.length);
     notifyListeners();
   }
 
-  void removeItem(Item item) {
+  void insert(int index, Item item) {
+    _items.insert(index, item);
+    _technique.setCount(_items.length);
+    notifyListeners();
+  }
+
+  void remove(Item item) {
     _items.remove(item);
     _technique.setCount(_items.length);
     notifyListeners();
   }
 
-  void clearItems() {
+  void clear() {
     _items.clear();
     _technique.setCount(0);
     notifyListeners();
+  }
+
+  int indexOf(Item item) {
+    return _items.indexOf(item);
   }
 
   bool get isEmpty => _items.isEmpty;
@@ -142,22 +152,24 @@ enum LoadState {
   Loaded
 }
 
-class CollectionsStore extends ChangeNotifier {
+class CollectionStore extends ChangeNotifier {
   List<Collection> _collections = [];
   LoadState _loadState = LoadState.Unloaded;
+  VoidCallback _saveCb;
 
-  List<Collection> get collections => _collections;
+  UnmodifiableListView<Collection> get collections => UnmodifiableListView(_collections);
   bool get isEmpty => _collections.isEmpty;
   bool get isNotEmpty => _collections.isNotEmpty;
   LoadState get loadState => _loadState;
 
-  CollectionsStore() {
+
+  CollectionStore() {
+    _saveCb = ()=>_save();
+
     _load().then((collections) {
       _collections = collections;
-      for (Collection c in collections) {
-        c.addListener((){
-          _save();
-        });
+      for (var c in _collections) {
+        c.addListener(_saveCb);
       }
       notifyListeners();
     });
@@ -165,26 +177,39 @@ class CollectionsStore extends ChangeNotifier {
 
   void add(Collection collection) {
     _collections.add(collection);
-    collection.addListener((){
-      _save();
-    });
+    collection.addListener(_saveCb);
+    notifyListeners();
+    _save();
+  }
+
+  void insert(int index, Collection collection) {
+    _collections.insert(index, collection);
+    collection.addListener(_saveCb);
     notifyListeners();
     _save();
   }
 
   void remove(Collection collection) {
     _collections.remove(collection);
+    collection.removeListener(_saveCb);
     notifyListeners();
     _save();
   }
 
+  int indexOf(Collection collection) {
+    return _collections.indexOf(collection);
+  }
+
   void clear() {
+    for (var c in _collections) {
+      c.removeListener(_saveCb);
+    }
     _collections.clear();
     notifyListeners();
     _save();
   }
 
-  Future<File> _collectionsStoreFile() async {
+  Future<File> _storeFile() async {
     final dir = await getApplicationDocumentsDirectory();
     return File('${dir.path}/store.json');
   }
@@ -194,7 +219,7 @@ class CollectionsStore extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final file = await _collectionsStoreFile();
+      final file = await _storeFile();
       String contents = await file.readAsString();
       final collectionStoreJson = jsonDecode(contents);
 
@@ -218,7 +243,7 @@ class CollectionsStore extends ChangeNotifier {
         collections.map((c) => c.toJson()).toList();
     String collectionsJson = jsonEncode(collectionsJsonData);
 
-    File store = await _collectionsStoreFile();
+    File store = await _storeFile();
     store.writeAsString(collectionsJson);
 
     print("CollectionStore::_save wrote:\n$collectionsJson\n");
