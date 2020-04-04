@@ -15,3 +15,4 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
         - https://twitter.com/davey_burke/status/1126878112170405888
         - https://github.com/flutter/flutter/issues/34678
         - https://github.com/flutter/flutter/issues/32748
+    - word wrap long collection names

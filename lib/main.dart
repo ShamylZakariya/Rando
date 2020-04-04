@@ -266,7 +266,7 @@ class CollectionEditor extends StatelessWidget {
 
   void _editTitle(BuildContext context, Collection collection) async {
     String value = await _showInputDialog(
-        context, "Edit collection name:", "Collection name", collection.name);
+        context, "Rename", "Collection name", collection.name);
     if (value != null && value.isNotEmpty) {
       collection.name = value;
     }
