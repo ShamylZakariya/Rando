@@ -130,14 +130,15 @@ class CollectionScreen extends StatelessWidget {
   }
 
   Widget _dieIcon(BuildContext context, Collection collection) {
+    final iconSize = 24.0;
     return collection.isNotEmpty
         ? IconButton(
-            icon: Image.asset("assets/die.png"),
+            icon: Image.asset("assets/die.png", width: iconSize, height: iconSize),
             onPressed: () {
               _rollDiceFor(context, collection);
             },
           )
-        : null;
+        : Container( width: iconSize, height: iconSize,);
   }
 
   void _deleteCollection(BuildContext context, Collection collection) {

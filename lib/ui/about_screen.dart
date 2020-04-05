@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rando/common/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -19,37 +20,47 @@ class AboutScreen extends StatelessWidget {
 
   Widget _body(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(64.0),
+      padding: const EdgeInsets.fromLTRB(32, 64, 32, 64),
       child: Center(
         child: Column(
           children: <Widget>[
-            Spacer(flex: 1,),
-            Text(
-              "rando",
-              style: Theme.of(context).textTheme.display2,
+            Spacer(
+              flex: 1,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 32),
+              child: Text(
+                "rando",
+                style: Theme.of(context).textTheme.display2,
+              ),
             ),
             Text(
               "A simple app for picking a thing at random, because sometimes that's a useful thing to do.",
               textAlign: TextAlign.center,
             ),
-            Spacer(flex: 1,),
-            RaisedButton(
-              child: Text("source"),
-              onPressed: ()=>_navigateTo(_sourceUrl),
-              color: Colors.cyan,
-              textColor: Colors.white,
+            Spacer(
+              flex: 1,
             ),
-            RaisedButton(
-              child: Text("icons from freepick.com"),
-              onPressed: ()=>_navigateTo(_freePickUrl),
-              color: Colors.cyan,
-              textColor: Colors.white,
-            )
+            _linkButton(context, "github.com/ShamylZakariya/rando", _sourceUrl),
+            _linkButton(context, "icons from freepick.com", _freePickUrl),
           ],
         ),
       ),
     );
   }
+
+  Widget _linkButton(BuildContext context, String title, String url) => SizedBox(
+        width: double.infinity,
+        child: FlatButton(
+          child: Text(title),
+          textColor: ThemeColors.primaryColor,
+          onPressed: () => _navigateTo(url),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(128),
+            side: BorderSide(color: ThemeColors.textColor.withAlpha(64)),
+          ),
+        ),
+      );
 
   void _navigateTo(String url) async {
     if (await canLaunch(url)) {
