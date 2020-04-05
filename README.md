@@ -10,7 +10,7 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
     - [Make collection editor scroll to dismiss](https://pub.dev/packages/stopper#-example-tab-)
     - [use a grid for main list](https://flutter.dev/docs/cookbook/lists/grid-lists)
     - the modal sheets are draggable, so put a handle on top?
-    - ~~how to make bottom bar area transparent on android (when using gestural nav)?--
+    - ~~how to make bottom bar area transparent on android (when using gestural nav)?~~
         - not supported by Flutter. :(
     - ~~word wrap long collection names~~
     - ~~need dice icon for the catalog list~~
