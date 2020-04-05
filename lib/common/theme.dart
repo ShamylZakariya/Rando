@@ -18,14 +18,14 @@ ThemeData appTheme(BuildContext context) {
       title: GoogleFonts.arvo(
         textStyle: baseTheme.title,
         color: _canvasColor,
-        fontSize: 36,
+        fontSize: baseTheme.title.fontSize * 1.2,
         fontWeight: FontWeight.w700,
       ),
       // collection editor title text style
       subtitle: GoogleFonts.arvo(
         textStyle: baseTheme.subtitle,
         color: _textColor,
-        fontSize: 24,
+        fontSize: baseTheme.subtitle.fontSize * 1.2,
       ),
       // input text dialog title text style
       display1: GoogleFonts.arvo(

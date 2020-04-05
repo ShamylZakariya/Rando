@@ -138,7 +138,7 @@ class _CollectionEditorState extends State<CollectionEditor>
   }
 
   void _addItem(BuildContext context, Collection collection) async {
-    String value = await showInputDialog(context, "Add item", "Name", null);
+    String value = await showInputDialog(context, "Add item...", "Name", null);
     if (value != null && value.isNotEmpty) {
       collection.add(Item(value));
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rando/ui/about_screen.dart';
 
 import 'package:rando/ui/collection_editor.dart';
 import 'package:rando/ui/dice_roll_result.dart';
@@ -17,6 +18,12 @@ class CollectionScreen extends StatelessWidget {
           style: Theme.of(context).textTheme.title,
         ),
         elevation: 0,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.info),
+            onPressed: () => _showAboutScreen(context),
+          )
+        ],
       ),
       body: _body(),
       floatingActionButton: FloatingActionButton(
@@ -37,6 +44,14 @@ class CollectionScreen extends StatelessWidget {
 
       _showCollection(context, newCollection);
     }
+  }
+
+  void _showAboutScreen(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AboutScreen(),
+        ));
   }
 
   Widget _body() {
@@ -101,7 +116,8 @@ class CollectionScreen extends StatelessWidget {
             key: Key(collection.name),
             onDismissed: (direction) => _deleteCollection(context, collection),
             child: ListTile(
-              title: Text(collection.name, style: Theme.of(context).textTheme.body1),
+              title: Text(collection.name,
+                  style: Theme.of(context).textTheme.body1),
               trailing: _dieIcon(context, collection),
               onTap: () {
                 _showCollection(context, collection);
