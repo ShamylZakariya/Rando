@@ -64,7 +64,10 @@ class AboutScreen extends StatelessWidget {
 
   void _navigateTo(String url) async {
     if (await canLaunch(url)) {
-      await launch(url);
+      await launch(
+        url,
+        forceWebView: true,
+        forceSafariVC: true);
     } else {
       print("Unable to launch url $url");
     }
