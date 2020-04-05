@@ -5,12 +5,40 @@ import 'package:provider/provider.dart';
 import 'package:rando/ui/util.dart';
 import 'package:rando/model.dart';
 
+class CollectionEditor extends StatefulWidget {
+  @override
+  _CollectionEditorState createState() => _CollectionEditorState();
+}
 
-class CollectionEditor extends StatelessWidget {
-  final _biggerFont = const TextStyle(fontSize: 18);
+class _CollectionEditorState extends State<CollectionEditor>
+    with TickerProviderStateMixin {
+  AnimationController _animationController;
+  Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration(milliseconds: 250), (){
+      _animationController.forward();
+    });
     return Consumer<Collection>(
       builder: (context, collection, child) {
         return Scaffold(
@@ -34,13 +62,21 @@ class CollectionEditor extends StatelessWidget {
             backgroundColor: Theme.of(context).canvasColor,
           ),
           body: _body(context, collection),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _addItem(context, collection),
-            tooltip: "Add item...",
-            child: Icon(Icons.add),
-          ),
+          floatingActionButton: _fab(context, collection),
         );
       },
+    );
+  }
+
+  Widget _fab(BuildContext context, Collection collection) {
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      alignment: Alignment.center,
+      child: FloatingActionButton(
+        onPressed: () => _addItem(context, collection),
+        tooltip: "Add item...",
+        child: Icon(Icons.add),
+      ),
     );
   }
 
@@ -93,7 +129,7 @@ class CollectionEditor extends StatelessWidget {
             key: Key(item.name),
             onDismissed: (direction) => _deleteItem(context, collection, item),
             child: ListTile(
-              title: Text(item.name, style: _biggerFont),
+              title: Text(item.name, style: Theme.of(context).textTheme.body1),
             ),
           );
         },

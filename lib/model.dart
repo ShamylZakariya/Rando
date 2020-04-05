@@ -63,6 +63,7 @@ class _PermutationRandomSelectionTechnique
     }
 
     if (_idx == count()) {
+      // reshuffle if we've exhausted permutation
       _shuffle(count());
     }
 

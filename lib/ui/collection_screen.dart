@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:rando/ui/collection_editor.dart';
+import 'package:rando/ui/dice_roll_result.dart';
 import 'package:rando/ui/util.dart';
 import 'package:rando/model.dart';
 
-
 class CollectionScreen extends StatelessWidget {
-  final _biggerFont = const TextStyle(fontSize: 18);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,8 +65,7 @@ class CollectionScreen extends StatelessWidget {
     return Container();
   }
 
-  Widget _bodyForLoadedEmptyState(
-      BuildContext context, CollectionStore store) {
+  Widget _bodyForLoadedEmptyState(BuildContext context, CollectionStore store) {
     return Center(
       child: Column(
         children: <Widget>[
@@ -104,15 +101,8 @@ class CollectionScreen extends StatelessWidget {
             key: Key(collection.name),
             onDismissed: (direction) => _deleteCollection(context, collection),
             child: ListTile(
-              title: Text(collection.name, style: _biggerFont),
-              trailing: collection.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(Icons.radio),
-                      onPressed: () {
-                        _rollDiceFor(context, collection);
-                      },
-                    )
-                  : null,
+              title: Text(collection.name, style: Theme.of(context).textTheme.body1),
+              trailing: _dieIcon(context, collection),
               onTap: () {
                 _showCollection(context, collection);
               },
@@ -123,8 +113,20 @@ class CollectionScreen extends StatelessWidget {
     );
   }
 
+  Widget _dieIcon(BuildContext context, Collection collection) {
+    return collection.isNotEmpty
+        ? IconButton(
+            icon: Image.asset("assets/die.png"),
+            onPressed: () {
+              _rollDiceFor(context, collection);
+            },
+          )
+        : null;
+  }
+
   void _deleteCollection(BuildContext context, Collection collection) {
-    CollectionStore store = Provider.of<CollectionStore>(context, listen: false);
+    CollectionStore store =
+        Provider.of<CollectionStore>(context, listen: false);
     int idx = store.indexOf(collection);
     store.remove(collection);
 
@@ -143,13 +145,21 @@ class CollectionScreen extends StatelessWidget {
   }
 
   void _showCollection(BuildContext context, Collection collection) {
+    _bottomSheet(context, collection, CollectionEditor());
+  }
+
+  void _rollDiceFor(BuildContext context, Collection collection) {
+    _bottomSheet(context, collection, DiceRollResult());
+  }
+
+  void _bottomSheet(BuildContext context, Collection collection, Widget view) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
+          height: MediaQuery.of(context).size.height * 0.95,
           child: ClipRRect(
             clipBehavior: Clip.antiAlias,
             borderRadius: BorderRadius.only(
@@ -158,17 +168,11 @@ class CollectionScreen extends StatelessWidget {
             ),
             child: ChangeNotifierProvider.value(
               value: collection,
-              child: CollectionEditor(),
+              child: view,
             ),
           ),
         );
       },
     );
-  }
-
-  void _rollDiceFor(BuildContext context, Collection collection) {
-    Item item = collection.randomItem();
-    print("_rollDiceFor: ${collection.name} item: ${item.name}");
-    showDiceRollResultDialog(context, collection, item);
   }
 }

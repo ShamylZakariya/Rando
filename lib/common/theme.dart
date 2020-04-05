@@ -15,30 +15,38 @@ ThemeData appTheme(BuildContext context) {
     iconTheme: IconThemeData(color: _textColor),
     textTheme: TextTheme(
       // main appbar text style
-      title: GoogleFonts.carterOne(
+      title: GoogleFonts.arvo(
         textStyle: baseTheme.title,
         color: _canvasColor,
         fontSize: 36,
         fontWeight: FontWeight.w700,
       ),
       // collection editor title text style
-      subtitle: GoogleFonts.carterOne(
+      subtitle: GoogleFonts.arvo(
         textStyle: baseTheme.subtitle,
         color: _textColor,
         fontSize: 24,
       ),
       // input text dialog title text style
-      display1: GoogleFonts.carterOne(
+      display1: GoogleFonts.arvo(
         textStyle: baseTheme.display1,
         color: _primaryColor,
         fontSize: baseTheme.display1.fontSize * 0.8,
       ),
       // input text dialog title text style
-      display2: GoogleFonts.carterOne(
+      display2: GoogleFonts.arvo(
         textStyle: baseTheme.display2,
         color: _primaryColor,
         fontSize: baseTheme.display2.fontSize * 0.8,
+      ),
+
+      // input text dialog title text style
+      display3: GoogleFonts.arvo(
+        textStyle: baseTheme.display3,
+        color: _primaryColor,
+        fontSize: baseTheme.display2.fontSize * 1,
       )
+
     ),
   );
 }
