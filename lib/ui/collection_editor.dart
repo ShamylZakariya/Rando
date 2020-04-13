@@ -125,7 +125,8 @@ class _CollectionEditorState extends State<CollectionEditor>
       child: Consumer<Item>(
         builder: (context, item, _) {
           return Dismissible(
-            background: dismissibleBackground(context),
+            background: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Left),
+            secondaryBackground: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Right),
             key: Key(item.name),
             onDismissed: (direction) => _deleteItem(context, collection, item),
             child: ListTile(

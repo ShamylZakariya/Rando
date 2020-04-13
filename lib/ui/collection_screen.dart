@@ -112,7 +112,8 @@ class CollectionScreen extends StatelessWidget {
       child: Consumer<Collection>(
         builder: (context, collection, _) {
           return Dismissible(
-            background: dismissibleBackground(context),
+            background: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Left),
+            secondaryBackground: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Right),
             key: Key(collection.name),
             onDismissed: (direction) => _deleteCollection(context, collection),
             child: ListTile(
@@ -176,7 +177,7 @@ class CollectionScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.95,
+          height: MediaQuery.of(context).size.height * 0.9,
           child: ClipRRect(
             clipBehavior: Clip.antiAlias,
             borderRadius: BorderRadius.only(

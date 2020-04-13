@@ -23,6 +23,7 @@ Future<String> showInputDialog(BuildContext context, String title,
                   decoration: InputDecoration(
                     labelText: valueTitle,
                   ),
+                  textCapitalization: TextCapitalization.sentences,
                   onChanged: (value) {
                     text = value;
                   },
@@ -42,28 +43,47 @@ Future<String> showInputDialog(BuildContext context, String title,
       });
 }
 
-Widget dismissibleBackground(BuildContext context) => Container(
-      color: Colors.red,
-      child: Row(
-        children: <Widget>[
-          AspectRatio(
-            aspectRatio: 1,
-            child: Icon(
-              Icons.delete,
-              color: Colors.white.withAlpha(194),
+enum DismissibleBackgroundIconPlacement {
+  Left, Right
+}
+
+Widget dismissibleBackground(BuildContext context, DismissibleBackgroundIconPlacement placement) {
+  switch(placement) {
+    case DismissibleBackgroundIconPlacement.Left:
+      return Container(
+        color: Colors.red,
+        child: Row(
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 1,
+              child: Icon(
+                Icons.delete,
+                color: Colors.white.withAlpha(194),
+              ),
             ),
-          ),
-          Spacer(),
-          AspectRatio(
-            aspectRatio: 1,
-            child: Icon(
-              Icons.delete,
-              color: Colors.white.withAlpha(194),
+            Spacer(),
+          ],
+        ),
+      );
+    case DismissibleBackgroundIconPlacement.Right:
+      return Container(
+        color: Colors.red,
+        child: Row(
+          children: <Widget>[
+            Spacer(),
+            AspectRatio(
+              aspectRatio: 1,
+              child: Icon(
+                Icons.delete,
+                color: Colors.white.withAlpha(194),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+  }
+  return null;
+}
 
 void showDiceRollResultDialog(
     BuildContext context, Collection collection, Item item) {
