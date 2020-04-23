@@ -20,6 +20,8 @@ Future<String> showInputDialog(BuildContext context, String title,
                   controller: TextEditingController()
                     ..text = initialValue != null ? initialValue : "",
                   autofocus: true,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
                   decoration: InputDecoration(
                     labelText: valueTitle,
                   ),

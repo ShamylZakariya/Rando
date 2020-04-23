@@ -24,3 +24,4 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
 
 Icon Sources:
     [Freepic](https://www.flaticon.com/authors/freepik)
+    [Color Palettes](https://colors.lol)
