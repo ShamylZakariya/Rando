@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:rando/common/theme.dart';
 
 Future<String> showInputDialog(BuildContext context, String title,
     String valueTitle, String initialValue) async {
   String text;
+  TextEditingController controller = TextEditingController(
+    text: initialValue != null ? initialValue : "",
+  );
+
   return showDialog(
       context: context,
       barrierDismissible: true,
@@ -16,15 +21,18 @@ Future<String> showInputDialog(BuildContext context, String title,
             children: <Widget>[
               Expanded(
                 child: TextField(
-                  controller: TextEditingController()
-                    ..text = initialValue != null ? initialValue : "",
+                  controller: controller,
                   autofocus: true,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
                   decoration: InputDecoration(
-                    labelText: valueTitle,
+                    hintText: valueTitle,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: ThemeColors.primaryColor.withAlpha(200), width: 2),
+                    ),
                   ),
                   textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.done,
                   onChanged: (value) {
                     text = value;
                   },
@@ -44,12 +52,11 @@ Future<String> showInputDialog(BuildContext context, String title,
       });
 }
 
-enum DismissibleBackgroundIconPlacement {
-  Left, Right
-}
+enum DismissibleBackgroundIconPlacement { Left, Right }
 
-Widget dismissibleBackground(BuildContext context, DismissibleBackgroundIconPlacement placement) {
-  switch(placement) {
+Widget dismissibleBackground(
+    BuildContext context, DismissibleBackgroundIconPlacement placement) {
+  switch (placement) {
     case DismissibleBackgroundIconPlacement.Left:
       return Container(
         color: Colors.red,
