@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rando/common/theme.dart';
 
 import 'package:rando/ui/util.dart';
 import 'package:rando/model.dart';
@@ -59,7 +60,7 @@ class _CollectionEditorState extends State<CollectionEditor>
               onPressed: () => Navigator.of(context).pop(),
             ),
             elevation: 0,
-            backgroundColor: Theme.of(context).canvasColor,
+            backgroundColor: ThemeColors.canvasColorLight,
           ),
           body: _body(context, collection),
           floatingActionButton: _fab(context, collection),
@@ -81,7 +82,7 @@ class _CollectionEditorState extends State<CollectionEditor>
   }
 
   Widget _body(BuildContext context, Collection collection) {
-    return _itemList(context, collection);
+    return Container(child: _itemList(context, collection), color: ThemeColors.canvasColorLight,);
   }
 
   Widget _itemList(BuildContext context, Collection collection) {

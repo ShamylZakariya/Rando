@@ -14,16 +14,15 @@ class CollectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "rando",
-          style: Theme.of(context).textTheme.title,
+        title: GestureDetector(
+          child: Text(
+            "rando",
+            style: Theme.of(context).textTheme.title,
+          ),
+          onTap: () => _showAboutScreen(context),
         ),
         elevation: 0,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.info),
-            onPressed: () => _showAboutScreen(context),
-          )
         ],
       ),
       body: _body(),

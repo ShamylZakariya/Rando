@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rando/model.dart';
+import 'package:rando/common/theme.dart';
 
 class DiceRollResult extends StatefulWidget {
   @override
@@ -47,7 +48,7 @@ class _DiceRollResultState extends State<DiceRollResult>
               onPressed: () => Navigator.of(context).pop(),
             ),
             elevation: 0,
-            backgroundColor: Theme.of(context).canvasColor,
+            backgroundColor: ThemeColors.canvasColorLight,
           ),
           body: _body(context, collection),
           floatingActionButton: _fab(context),
@@ -75,6 +76,7 @@ class _DiceRollResultState extends State<DiceRollResult>
   Widget _body(BuildContext context, Collection collection) {
     return Container(
       alignment: Alignment.centerLeft,
+      color: ThemeColors.canvasColorLight,
       child: Padding(
         padding: EdgeInsets.fromLTRB(24, 24, 24, 88),
         child: Text(
