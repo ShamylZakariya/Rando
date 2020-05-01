@@ -10,11 +10,10 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
     - [Make collection editor scroll to dismiss](https://pub.dev/packages/stopper#-example-tab-)
         - https://pub.dev/packages/sliding_sheet
     - [use a grid for main list](https://flutter.dev/docs/cookbook/lists/grid-lists)
-    - the modal sheets are draggable, so put a handle on top?
     - add another button to the Add Item... dialog, "Add ANother" or something which indicates to add the current, but keep dialog open to add another item
     - be smarter about sheet height; it is too tall
-    - if I monitor dismiss direction, I can show the trashcan icon only on left or right, instead of both, which looks weird.
-        - possibly use dragStart
+    - ~~if I monitor dismiss direction, I can show the trashcan icon only on left or right, instead of both, which looks weird.~~
+    - ~~the modal sheets are draggable, so put a handle on top?~~
     - ~~how to make bottom bar area transparent on android (when using gestural nav)?~~
         - not supported by Flutter. :(
     - ~~word wrap long collection names~~
