@@ -11,9 +11,12 @@ class AboutScreen extends StatelessWidget {
     return Container(
         child: Scaffold(
       appBar: AppBar(
-        title: Text("about", style: Theme.of(context).textTheme.title),
-        elevation: 0,
-      ),
+          title: Text("about", style: Theme.of(context).textTheme.title),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop(),
+          )),
       body: _body(context),
     ));
   }
@@ -49,7 +52,8 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _linkButton(BuildContext context, String title, String url) => SizedBox(
+  Widget _linkButton(BuildContext context, String title, String url) =>
+      SizedBox(
         width: double.infinity,
         child: FlatButton(
           child: Text(title),
@@ -64,10 +68,7 @@ class AboutScreen extends StatelessWidget {
 
   void _navigateTo(String url) async {
     if (await canLaunch(url)) {
-      await launch(
-        url,
-        forceWebView: true,
-        forceSafariVC: true);
+      await launch(url, forceWebView: true, forceSafariVC: true);
     } else {
       print("Unable to launch url $url");
     }
