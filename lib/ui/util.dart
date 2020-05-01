@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rando/model.dart';
 
 Future<String> showInputDialog(BuildContext context, String title,
     String valueTitle, String initialValue) async {
@@ -85,38 +84,4 @@ Widget dismissibleBackground(BuildContext context, DismissibleBackgroundIconPlac
       );
   }
   return null;
-}
-
-void showDiceRollResultDialog(
-    BuildContext context, Collection collection, Item item) {
-  showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "You got",
-            style: Theme.of(context).textTheme.display1,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                item.name,
-                style: Theme.of(context).textTheme.display3,
-                textAlign: TextAlign.start,
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Ok"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      });
 }

@@ -7,6 +7,7 @@ import 'package:rando/ui/collection_editor.dart';
 import 'package:rando/ui/dice_roll_result.dart';
 import 'package:rando/ui/util.dart';
 import 'package:rando/model.dart';
+import 'package:rando/common/theme.dart';
 
 class CollectionScreen extends StatelessWidget {
   @override
@@ -112,8 +113,10 @@ class CollectionScreen extends StatelessWidget {
       child: Consumer<Collection>(
         builder: (context, collection, _) {
           return Dismissible(
-            background: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Left),
-            secondaryBackground: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Right),
+            background: dismissibleBackground(
+                context, DismissibleBackgroundIconPlacement.Left),
+            secondaryBackground: dismissibleBackground(
+                context, DismissibleBackgroundIconPlacement.Right),
             key: Key(collection.name),
             onDismissed: (direction) => _deleteCollection(context, collection),
             child: ListTile(
@@ -134,12 +137,16 @@ class CollectionScreen extends StatelessWidget {
     final iconSize = 24.0;
     return collection.isNotEmpty
         ? IconButton(
-            icon: Image.asset("assets/die.png", width: iconSize, height: iconSize),
+            icon: Image.asset("assets/die.png",
+                width: iconSize, height: iconSize),
             onPressed: () {
               _rollDiceFor(context, collection);
             },
           )
-        : Container( width: iconSize, height: iconSize,);
+        : Container(
+            width: iconSize,
+            height: iconSize,
+          );
   }
 
   void _deleteCollection(BuildContext context, Collection collection) {
@@ -177,16 +184,36 @@ class CollectionScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.9,
+          height: MediaQuery.of(context).size.height * 0.75,
           child: ClipRRect(
             clipBehavior: Clip.antiAlias,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(8),
               topRight: Radius.circular(8),
             ),
-            child: ChangeNotifierProvider.value(
-              value: collection,
-              child: view,
+            // layer a drag handle atop the sheet content view
+            child: Stack(
+              children: <Widget>[
+                ChangeNotifierProvider.value(
+                  value: collection,
+                  child: view,
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 6, 0, 0),
+                  child: Center(
+                    heightFactor: 1,
+                    child: SizedBox(
+                      height: 3,
+                      width: 48,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            color: ThemeColors.textColor.withAlpha(64)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
