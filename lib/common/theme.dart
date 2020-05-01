@@ -5,13 +5,14 @@ class ThemeColors {
   static final Color textColor = Color(0xFF222222);
   static final Color primaryColor = Color(0xFF000133);
   static final Color accentColor = Color(0xFFFC86AA);
-  static final Color canvasColor = Color(0xFFD8DCD6);
+  static final Color canvasColor = Color(0xFFdcdcdc);
+  static final Color canvasColorLight = Color(0xFFe7e7e7);
 }
 
 ThemeData appTheme(BuildContext context) {
   TextTheme baseTheme = Theme.of(context).textTheme;
   return ThemeData(
-    primaryColor: ThemeColors.primaryColor,
+    primaryColor: ThemeColors.canvasColor,
     accentColor: ThemeColors.accentColor,
     canvasColor: ThemeColors.canvasColor,
     iconTheme: IconThemeData(color: ThemeColors.textColor),
@@ -19,8 +20,8 @@ ThemeData appTheme(BuildContext context) {
       // main appbar text style
       title: GoogleFonts.arvo(
         textStyle: baseTheme.title,
-        color: ThemeColors.canvasColor,
-        fontSize: baseTheme.title.fontSize * 1.2,
+        color: ThemeColors.primaryColor,
+        fontSize: baseTheme.title.fontSize * 2.5,
         fontWeight: FontWeight.w700,
       ),
       // collection editor title text style

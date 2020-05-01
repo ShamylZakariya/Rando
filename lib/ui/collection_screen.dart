@@ -100,35 +100,45 @@ class CollectionScreen extends StatelessWidget {
     final Iterable<Widget> collections = store.collections.map((Collection c) {
       return _buildCollectionRow(context, c);
     });
-    final List<Widget> divided =
-        ListTile.divideTiles(context: context, tiles: collections).toList();
-    return ListView(
-      children: divided,
-    );
+    return ListView(children: collections.toList());
+    // final List<Widget> divided =
+    //     ListTile.divideTiles(context: context, tiles: collections).toList();
+    // return ListView(
+    //   children: divided,
+    // );
   }
 
   Widget _buildCollectionRow(BuildContext context, Collection collection) {
     return ChangeNotifierProvider.value(
       value: collection,
       child: Consumer<Collection>(
-        builder: (context, collection, _) {
-          return Dismissible(
-            background: dismissibleBackground(
-                context, DismissibleBackgroundIconPlacement.Left),
-            secondaryBackground: dismissibleBackground(
-                context, DismissibleBackgroundIconPlacement.Right),
-            key: Key(collection.name),
-            onDismissed: (direction) => _deleteCollection(context, collection),
-            child: ListTile(
-              title: Text(collection.name,
-                  style: Theme.of(context).textTheme.body1),
-              trailing: _dieIcon(context, collection),
-              onTap: () {
-                _showCollection(context, collection);
-              },
+        builder: (context, collection, _) => Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ClipRRect(
+            clipBehavior: Clip.antiAlias,
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            child: Container(
+              color: ThemeColors.canvasColorLight,
+              child: Dismissible(
+                background: dismissibleBackground(
+                    context, DismissibleBackgroundIconPlacement.Left),
+                secondaryBackground: dismissibleBackground(
+                    context, DismissibleBackgroundIconPlacement.Right),
+                key: Key(collection.name),
+                onDismissed: (direction) =>
+                    _deleteCollection(context, collection),
+                child: ListTile(
+                  title: Text(collection.name,
+                      style: Theme.of(context).textTheme.body2),
+                  trailing: _dieIcon(context, collection),
+                  onTap: () {
+                    _showCollection(context, collection);
+                  },
+                ),
+              ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
