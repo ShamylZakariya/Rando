@@ -40,7 +40,7 @@ class _DiceRollResultState extends State<DiceRollResult>
           appBar: AppBar(
             title: Text(
               collection.name,
-              style: Theme.of(context).textTheme.subtitle,
+              style: Theme.of(context).textTheme.subtitle2,
             ),
             iconTheme: IconThemeData(color: Theme.of(context).iconTheme.color),
             leading: IconButton(

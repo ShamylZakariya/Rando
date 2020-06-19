@@ -11,7 +11,7 @@ class AboutScreen extends StatelessWidget {
     return Container(
         child: Scaffold(
       appBar: AppBar(
-          title: Text("about", style: Theme.of(context).textTheme.title),
+          title: Text("about", style: Theme.of(context).textTheme.headline6),
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.close),

@@ -17,7 +17,7 @@ class CollectionScreen extends StatelessWidget {
         title: GestureDetector(
           child: Text(
             "rando",
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
           onTap: () => _showAboutScreen(context),
         ),

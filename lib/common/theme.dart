@@ -17,37 +17,37 @@ ThemeData appTheme(BuildContext context) {
     canvasColor: ThemeColors.canvasColor,
     iconTheme: IconThemeData(color: ThemeColors.textColor),
     textTheme: TextTheme(
-      // main appbar text style
-      title: GoogleFonts.arvo(
-        textStyle: baseTheme.title,
+      // main appbar text style WAS TITLE
+      headline6: GoogleFonts.arvo(
+        textStyle: baseTheme.headline6,
         color: ThemeColors.primaryColor,
-        fontSize: baseTheme.title.fontSize * 2.5,
+        fontSize: baseTheme.headline6.fontSize * 2.5,
         fontWeight: FontWeight.w700,
       ),
-      // collection editor title text style
-      subtitle: GoogleFonts.arvo(
-        textStyle: baseTheme.subtitle,
+      // collection editor title text style WAS SUBTITLE
+      subtitle2: GoogleFonts.arvo(
+        textStyle: baseTheme.subtitle2,
         color: ThemeColors.textColor,
-        fontSize: baseTheme.subtitle.fontSize * 1.2,
+        fontSize: baseTheme.subtitle2.fontSize * 1.2,
       ),
-      // input text dialog title text style
-      display1: GoogleFonts.arvo(
-        textStyle: baseTheme.display1,
+      // input text dialog title text style WAS display1
+      headline4: GoogleFonts.arvo(
+        textStyle: baseTheme.headline4,
         color: ThemeColors.primaryColor,
-        fontSize: baseTheme.display1.fontSize * 0.8,
+        fontSize: baseTheme.headline4.fontSize * 0.8,
       ),
-      // input text dialog title text style
-      display2: GoogleFonts.arvo(
-        textStyle: baseTheme.display2,
+      // input text dialog title text style WAS display2
+      headline3: GoogleFonts.arvo(
+        textStyle: baseTheme.headline3,
         color: ThemeColors.primaryColor,
-        fontSize: baseTheme.display2.fontSize * 0.8,
+        fontSize: baseTheme.headline3.fontSize * 0.8,
       ),
 
-      // input text dialog title text style
-      display3: GoogleFonts.arvo(
-        textStyle: baseTheme.display3,
+      // input text dialog title text style WAS display3
+      headline2: GoogleFonts.arvo(
+        textStyle: baseTheme.headline2,
         color: ThemeColors.primaryColor,
-        fontSize: baseTheme.display2.fontSize * 1,
+        fontSize: baseTheme.headline2.fontSize * 1,
       )
 
     ),
