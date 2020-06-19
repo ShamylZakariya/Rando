@@ -38,7 +38,7 @@ class AboutScreen extends StatelessWidget {
               ),
             ),
             Text(
-              "A simple app for picking a thing at random, because sometimes that's a useful thing to do.",
+              "A simple app for picking a thing at random, because sometimes that's a thing you have to do.",
               textAlign: TextAlign.center,
             ),
             Spacer(

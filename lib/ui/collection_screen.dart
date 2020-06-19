@@ -22,8 +22,7 @@ class CollectionScreen extends StatelessWidget {
           onTap: () => _showAboutScreen(context),
         ),
         elevation: 0,
-        actions: <Widget>[
-        ],
+        actions: <Widget>[],
       ),
       body: _body(),
       floatingActionButton: FloatingActionButton(
@@ -100,11 +99,6 @@ class CollectionScreen extends StatelessWidget {
       return _buildCollectionRow(context, c);
     });
     return ListView(children: collections.toList());
-    // final List<Widget> divided =
-    //     ListTile.divideTiles(context: context, tiles: collections).toList();
-    // return ListView(
-    //   children: divided,
-    // );
   }
 
   Widget _buildCollectionRow(BuildContext context, Collection collection) {
@@ -129,9 +123,12 @@ class CollectionScreen extends StatelessWidget {
                 child: ListTile(
                   title: Text(collection.name,
                       style: Theme.of(context).textTheme.body2),
-                  trailing: _dieIcon(context, collection),
+                  trailing: IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () => _showCollection(context, collection),
+                  ),
                   onTap: () {
-                    _showCollection(context, collection);
+                    _rollDiceFor(context, collection);
                   },
                 ),
               ),
@@ -140,22 +137,6 @@ class CollectionScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _dieIcon(BuildContext context, Collection collection) {
-    final iconSize = 24.0;
-    return collection.isNotEmpty
-        ? IconButton(
-            icon: Image.asset("assets/die.png",
-                width: iconSize, height: iconSize),
-            onPressed: () {
-              _rollDiceFor(context, collection);
-            },
-          )
-        : Container(
-            width: iconSize,
-            height: iconSize,
-          );
   }
 
   void _deleteCollection(BuildContext context, Collection collection) {
