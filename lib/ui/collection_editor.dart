@@ -37,7 +37,7 @@ class _CollectionEditorState extends State<CollectionEditor>
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(milliseconds: 250), (){
+    Future.delayed(Duration(milliseconds: 250), () {
       _animationController.forward();
     });
     return Consumer<Collection>(
@@ -82,7 +82,10 @@ class _CollectionEditorState extends State<CollectionEditor>
   }
 
   Widget _body(BuildContext context, Collection collection) {
-    return Container(child: _itemList(context, collection), color: ThemeColors.canvasColorLight,);
+    return Container(
+      child: _itemList(context, collection),
+      color: ThemeColors.canvasColorLight,
+    );
   }
 
   Widget _itemList(BuildContext context, Collection collection) {
@@ -126,12 +129,15 @@ class _CollectionEditorState extends State<CollectionEditor>
       child: Consumer<Item>(
         builder: (context, item, _) {
           return Dismissible(
-            background: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Left),
-            secondaryBackground: dismissibleBackground(context, DismissibleBackgroundIconPlacement.Right),
+            background: dismissibleBackground(
+                context, DismissibleBackgroundIconPlacement.Left),
+            secondaryBackground: dismissibleBackground(
+                context, DismissibleBackgroundIconPlacement.Right),
             key: Key(item.name),
             onDismissed: (direction) => _deleteItem(context, collection, item),
             child: ListTile(
-              title: Text(item.name, style: Theme.of(context).textTheme.body1),
+              title:
+                  Text(item.name, style: Theme.of(context).textTheme.bodyText2),
             ),
           );
         },
@@ -149,7 +155,8 @@ class _CollectionEditorState extends State<CollectionEditor>
   void _deleteItem(BuildContext context, Collection collection, Item item) {
     int idx = collection.indexOf(item);
     collection.remove(item);
-    Scaffold.of(context).showSnackBar(
+
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Deleted ${item.name}"),
         action: SnackBarAction(

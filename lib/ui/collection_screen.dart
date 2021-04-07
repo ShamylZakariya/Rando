@@ -122,7 +122,7 @@ class CollectionScreen extends StatelessWidget {
                     _deleteCollection(context, collection),
                 child: ListTile(
                   title: Text(collection.name,
-                      style: Theme.of(context).textTheme.body2),
+                      style: Theme.of(context).textTheme.bodyText1),
                   trailing: IconButton(
                     icon: Icon(Icons.edit),
                     onPressed: () => _showCollection(context, collection),
@@ -145,7 +145,7 @@ class CollectionScreen extends StatelessWidget {
     int idx = store.indexOf(collection);
     store.remove(collection);
 
-    Scaffold.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Deleted ${collection.name}"),
         action: SnackBarAction(

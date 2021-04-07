@@ -15,7 +15,7 @@ Future<String> showInputDialog(BuildContext context, String title,
         return AlertDialog(
           title: Text(
             title,
-            style: Theme.of(context).textTheme.display1,
+            style: Theme.of(context).textTheme.headline4,
           ),
           content: Row(
             children: <Widget>[
@@ -28,7 +28,9 @@ Future<String> showInputDialog(BuildContext context, String title,
                   decoration: InputDecoration(
                     hintText: valueTitle,
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: ThemeColors.primaryColor.withAlpha(200), width: 2),
+                      borderSide: BorderSide(
+                          color: ThemeColors.primaryColor.withAlpha(200),
+                          width: 2),
                     ),
                   ),
                   textCapitalization: TextCapitalization.sentences,
@@ -41,7 +43,7 @@ Future<String> showInputDialog(BuildContext context, String title,
             ],
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text("Ok"),
               onPressed: () {
                 Navigator.of(context).pop(text);

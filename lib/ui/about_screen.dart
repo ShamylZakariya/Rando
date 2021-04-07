@@ -34,7 +34,7 @@ class AboutScreen extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 32),
               child: Text(
                 "rando",
-                style: Theme.of(context).textTheme.display2,
+                style: Theme.of(context).textTheme.headline3,
               ),
             ),
             Text(
@@ -55,14 +55,10 @@ class AboutScreen extends StatelessWidget {
   Widget _linkButton(BuildContext context, String title, String url) =>
       SizedBox(
         width: double.infinity,
-        child: FlatButton(
+        child: TextButton(
           child: Text(title),
-          textColor: ThemeColors.primaryColor,
+          style: raisedButtonStyle,
           onPressed: () => _navigateTo(url),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(128),
-            side: BorderSide(color: ThemeColors.textColor.withAlpha(64)),
-          ),
         ),
       );
 

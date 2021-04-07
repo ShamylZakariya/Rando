@@ -17,39 +17,56 @@ ThemeData appTheme(BuildContext context) {
     canvasColor: ThemeColors.canvasColor,
     iconTheme: IconThemeData(color: ThemeColors.textColor),
     textTheme: TextTheme(
-      // main appbar text style WAS TITLE
-      headline6: GoogleFonts.arvo(
-        textStyle: baseTheme.headline6,
-        color: ThemeColors.primaryColor,
-        fontSize: baseTheme.headline6.fontSize * 2.5,
-        fontWeight: FontWeight.w700,
-      ),
-      // collection editor title text style WAS SUBTITLE
-      subtitle2: GoogleFonts.arvo(
-        textStyle: baseTheme.subtitle2,
-        color: ThemeColors.textColor,
-        fontSize: baseTheme.subtitle2.fontSize * 1.2,
-      ),
-      // input text dialog title text style WAS display1
-      headline4: GoogleFonts.arvo(
-        textStyle: baseTheme.headline4,
-        color: ThemeColors.primaryColor,
-        fontSize: baseTheme.headline4.fontSize * 0.8,
-      ),
-      // input text dialog title text style WAS display2
-      headline3: GoogleFonts.arvo(
-        textStyle: baseTheme.headline3,
-        color: ThemeColors.primaryColor,
-        fontSize: baseTheme.headline3.fontSize * 0.8,
-      ),
+        // main appbar text style WAS TITLE
+        headline6: GoogleFonts.arvo(
+          textStyle: baseTheme.headline6,
+          color: ThemeColors.primaryColor,
+          fontSize: baseTheme.headline6.fontSize * 2.5,
+          fontWeight: FontWeight.w700,
+        ),
+        // collection editor title text style WAS SUBTITLE
+        subtitle2: GoogleFonts.arvo(
+          textStyle: baseTheme.subtitle2,
+          color: ThemeColors.textColor,
+          fontSize: baseTheme.subtitle2.fontSize * 1.2,
+        ),
+        // input text dialog title text style WAS display1
+        headline4: GoogleFonts.arvo(
+          textStyle: baseTheme.headline4,
+          color: ThemeColors.primaryColor,
+          fontSize: baseTheme.headline4.fontSize * 0.8,
+        ),
+        // input text dialog title text style WAS display2
+        headline3: GoogleFonts.arvo(
+          textStyle: baseTheme.headline3,
+          color: ThemeColors.primaryColor,
+          fontSize: baseTheme.headline3.fontSize * 0.8,
+        ),
 
-      // input text dialog title text style WAS display3
-      headline2: GoogleFonts.arvo(
-        textStyle: baseTheme.headline2,
-        color: ThemeColors.primaryColor,
-        fontSize: baseTheme.headline2.fontSize * 1,
-      )
-
-    ),
+        // input text dialog title text style WAS display3
+        headline2: GoogleFonts.arvo(
+          textStyle: baseTheme.headline2,
+          color: ThemeColors.primaryColor,
+          fontSize: baseTheme.headline2.fontSize * 1,
+        )),
   );
 }
+
+final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+  primary: ThemeColors.primaryColor,
+  minimumSize: Size(88, 36),
+  padding: EdgeInsets.symmetric(horizontal: 16.0),
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+  ),
+);
+
+final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
+  primary: ThemeColors.primaryColor.withAlpha(32),
+  onPrimary: ThemeColors.primaryColor,
+  minimumSize: Size(88, 36),
+  padding: EdgeInsets.symmetric(horizontal: 16),
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+  ),
+);

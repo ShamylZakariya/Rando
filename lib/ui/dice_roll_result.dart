@@ -81,7 +81,7 @@ class _DiceRollResultState extends State<DiceRollResult>
         padding: EdgeInsets.fromLTRB(24, 24, 24, 88),
         child: Text(
           _result.name,
-          style: Theme.of(context).textTheme.display3,
+          style: Theme.of(context).textTheme.headline2,
         ),
       ),
     );
