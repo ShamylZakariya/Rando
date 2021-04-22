@@ -12,6 +12,7 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
     - [use a grid for main list](https://flutter.dev/docs/cookbook/lists/grid-lists)
     - add another button to the Add Item... dialog, "Add ANother" or something which indicates to add the current, but keep dialog open to add another item
     - be smarter about sheet height; it is too tall
+    - bottom sheets scroll up weirdly when keyboard is visible
     - ~~if I monitor dismiss direction, I can show the trashcan icon only on left or right, instead of both, which looks weird.~~
     - ~~the modal sheets are draggable, so put a handle on top?~~
     - ~~how to make bottom bar area transparent on android (when using gestural nav)?~~
@@ -20,7 +21,8 @@ Simple app for making collections of stuff and easily rolling a die to pick one 
     - ~~need dice icon for the catalog list~~
     - ~~need to make the dice roll dialog not suck~~
     - ~~need an about screen which attributes flaticon.com~~
-
+4) App icons which aren't garbage
+    - see https://medium.com/@psyanite/how-to-add-app-launcher-icons-in-flutter-bd92b0e0873a for mechanism
 Icon Sources:
     [Freepic](https://www.flaticon.com/authors/freepik)
     [Color Palettes](https://colors.lol)
